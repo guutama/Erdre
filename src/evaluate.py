@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
 """Evaluate deep learning model.
-
 Author:
     Erik Johannes Husom
-
 Created:
     2020-09-17
-
 """
 import json
 import shutil
@@ -45,14 +42,15 @@ from config import (
     PREDICTIONS_FILE_PATH
 )
 
-
+from explain import (
+    shap_force_plot_local_tree,
+    shap_waterfall_plot_local
+)
 # class ConformalPredictionModel(RegressorMixin):
 class ConformalPredictionModel(RegressorAdapter):
     """Implement custom sklearn model to use with the nonconformist library.
-
     Args:
         model_filepath (str): Path to ALREADY TRAINED model.
-
     """
 
     # def __init__(self, model_filepath):
@@ -79,13 +77,11 @@ class ConformalPredictionModel(RegressorAdapter):
 
 def evaluate(model_filepath, train_filepath, test_filepath, calibrate_filepath):
     """Evaluate model to estimate power.
-
     Args:
         model_filepath (str): Path to model.
         train_filepath (str): Path to train set.
         test_filepath (str): Path to test set.
         calibrate_filepath (str): Path to calibrate set.
-
     """
 
     METRICS_FILE_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -209,13 +205,25 @@ def evaluate(model_filepath, train_filepath, test_filepath, calibrate_filepath):
 
         plot_prediction(y_test, y_pred, info="Accuracy: {})".format(accuracy))
 
-        plot_confusion(y_test, y_pred)
+        #plot_confusion(y_test, y_pred)
 
         with open(METRICS_FILE_PATH, "w") as f:
             json.dump(dict(accuracy=accuracy), f)
 
         # ==========================================
         # TODO: Fix SHAP code
+
+        input_columns = pd.read_csv(DATA_PATH / "input_columns.csv").iloc[:, -1]
+
+        row_number = 1
+        if type(X_test) is np.ndarray:
+            row = np.round(X_test[row_number], 5)
+
+        elif type(X_test) is pd.DataFrame:
+            row = np.round(X_test.iloc[row_number].values[0], 5)
+        #shap_force_plot_local_tree(model=model, row=row, feature_names= input_columns,show=False,figsize=(20,10),contribution_threshold=0.05,matplotlib=False)
+        shap_waterfall_plot_local(model=model, row=row, feature_names=input_columns, max_display=15, show=True)
+
         # explainer = shap.TreeExplainer(model, X_test[:10])
         # shap_values = explainer.shap_values(X_test[:10])
         # plt.figure()
@@ -278,14 +286,12 @@ def plot_confusion(y_test, y_pred):
     plt.figure(figsize=(10, 7))
     sn.heatmap(df_confusion, cmap="Blues", annot=True, annot_kws={"size": 16})
     plt.savefig(PLOTS_PATH / "confusion_matrix.png")
-
+    plt.show()
 
 def save_predictions(df_predictions):
     """Save the predictions along with the ground truth as a csv file.
-
     Args:
         df_predictions_true (pandas dataframe): pandas data frame with the predictions and ground truth values.
-
     """
 
     PREDICTIONS_FILE_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -295,10 +301,8 @@ def save_predictions(df_predictions):
 
 def plot_confidence_intervals(df):
     """Plot the confidence intervals generated with conformal prediction.
-
     Args:
         df (pandas dataframe): pandas data frame.
-
     """
 
     INTERVALS_PLOT_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -340,7 +344,6 @@ def plot_confidence_intervals(df):
 
 def plot_prediction(y_true, y_pred, inputs=None, info=""):
     """Plot the prediction compared to the true targets.
-
     Args:
         y_true (array): True targets.
         y_pred (array): Predicted targets.
@@ -348,7 +351,6 @@ def plot_prediction(y_true, y_pred, inputs=None, info=""):
         inputs (array): Inputs corresponding to the targets passed. If
             provided, the inputs will be plotted together with the targets.
         info (str): Information to include in the title string.
-
     """
 
     PREDICTION_PLOT_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -405,7 +407,6 @@ def plot_prediction(y_true, y_pred, inputs=None, info=""):
 def plot_sequence_predictions(y_true, y_pred):
     """
     Plot the prediction compared to the true targets.
-
     """
 
     target_size = y_true.shape[-1]
