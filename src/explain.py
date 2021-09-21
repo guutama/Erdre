@@ -3,17 +3,8 @@
 Author:
      Gutama Ibrahim Mohammad 
 Created:  
-       21/09/2021
-
-"""
-
-
-#!/usr/bin/env python3
-""" 
-Author:
-     Gutama Ibrahim Mohammad 
-Created:  
        16/09/2021
+
 """
 import os.path
 import sys
@@ -44,12 +35,14 @@ def shap_force_plot_local_tree(
         text_rotation=90,
         contribution_threshold=0.05):
     """
+
     Args:
         model: tree based machine learning model eg. RandomForest,DecisionTree, Xgboost
         row: (ndarray or pd.Dataframe),
               Matrix of feature values (# features) or (# samples x # features).
                  This provides the values of all the features,
                  and should be the same shape as the shap_values argument.
+
         feature_names: list
                          Containing features used to train the model
                          List of feature names (# features)
@@ -60,6 +53,7 @@ def shap_force_plot_local_tree(
                  The transformation used when drawing the tick mark labels.
                  Using logit will change log-odds numbers into probabilities.
         plot_cmap:
+
         matplotlib:bool
                  Whether to use the default Javascript output, or the (less developed) matplotlib output.
                  Using matplotlib can be helpful in scenarios where rendering Javascript/HTML is inconvenient.
@@ -72,7 +66,9 @@ def shap_force_plot_local_tree(
                  Controls the feature names/values that are displayed on force plot.
                  Only features that the magnitude of their shap value is
                   larger than min_perc * (sum of all abs shap values) will be displayed.
+
     Returns:None
+
     """
 
     explainer = shap.TreeExplainer(model)
@@ -107,3 +103,4 @@ def shap_waterfall_plot_local(model,row,feature_names,max_display=15, show=True)
 
 
     #fig.savefig(PLOTS_PATH / "shap_tree_waterfall_plot_local.png")
+
