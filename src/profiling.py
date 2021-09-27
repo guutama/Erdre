@@ -32,10 +32,13 @@ def profile(dir_path):
 
     # If no name of data set is given, all files present in 'assets/data/raw'
     # will be used.
+
     if dataset != None:
-        dir_path += "/" + dataset
+        dir_path += "/" + dataset[0]
+
 
     filepaths = find_files(dir_path, file_extension=".csv")
+    print(filepaths)
 
     dfs = []
 

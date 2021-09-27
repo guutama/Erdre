@@ -42,10 +42,13 @@ def clean(dir_path):
 
     # If no name of data set is given, all files present in 'assets/data/raw'
     # will be used.
+    target_path = find_files(dir_path + "/" + dataset[1], file_extension=".csv")[0]
+    print(target_path)
     if dataset is not None:
-        dir_path += "/" + dataset
+        dir_path += "/" + dataset[0]
 
     filepaths = find_files(dir_path, file_extension=".csv")
+
 
     DATA_CLEANED_PATH.mkdir(parents=True, exist_ok=True)
 
@@ -53,12 +56,18 @@ def clean(dir_path):
     removable_variables = parse_profile_warnings()
 
     dfs = []
-
-    for filepath in filepaths:
+    target_df = pd.read_csv(target_path)
+    for i, filepath in enumerate(filepaths,start=1):
 
         # Read csv
         df = pd.read_csv(filepath)
 
+        #frame = pd.read_csv(filepath + "experiment_{}.csv".format(exp))
+        row = target_df[target_df['No'] == i]
+        df['tool_condition'] = "worn" if row.iloc[0]['tool_condition'] == 'worn' else "unworn"
+        #frame['target'] = 1 if row.iloc[0]['tool_condition'] == 'worn' else 0
+        #frames.append(frame)
+        #df = pd.concat(frames, ignore_index=True)
         # If the first column is an index column, remove it.
         if df.iloc[:, 0].is_monotonic:
             df = df.iloc[:, 1:]
@@ -152,8 +161,8 @@ def parse_profile_warnings():
 
     """
     params = yaml.safe_load(open("params.yaml"))["clean"]
-    correlation_metric = "pearson"
-    # correlation_metric = params["correlation_metric"]
+    #correlation_metric = "pearson"
+    #correlation_metric = params["correlation_metric"]
     target = params["target"]
 
     profile_json = json.load(open(PROFILE_PATH / "profile.json"))

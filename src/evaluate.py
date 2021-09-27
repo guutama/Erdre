@@ -43,8 +43,8 @@ from config import (
 )
 
 from explain import (
-    shap_force_plot_local_tree,
-    shap_waterfall_plot_local
+    vitualize_individual_prediction_tree_model_shap,
+    visualize_feature_effects_global_tree_model_shap
 )
 # class ConformalPredictionModel(RegressorMixin):
 class ConformalPredictionModel(RegressorAdapter):
@@ -215,14 +215,16 @@ def evaluate(model_filepath, train_filepath, test_filepath, calibrate_filepath):
 
         input_columns = pd.read_csv(DATA_PATH / "input_columns.csv").iloc[:, -1]
 
-        row_number = 1
+        row_number = params["explainable_data_point"]
         if type(X_test) is np.ndarray:
             row = np.round(X_test[row_number], 5)
 
         elif type(X_test) is pd.DataFrame:
             row = np.round(X_test.iloc[row_number].values[0], 5)
-        #shap_force_plot_local_tree(model=model, row=row, feature_names= input_columns,show=False,figsize=(20,10),contribution_threshold=0.05,matplotlib=False)
-        shap_waterfall_plot_local(model=model, row=row, feature_names=input_columns, max_display=15, show=True)
+        vitualize_individual_prediction_tree_model_shap(model=model, row=row, feature_names= input_columns,
+                                                        show=True, figsize=(20, 10), contribution_threshold=0.05, matplotlib=True)
+        visualize_feature_effects_global_tree_model_shap(model=model,test_data=X_test,feature_names=input_columns)
+
 
         # explainer = shap.TreeExplainer(model, X_test[:10])
         # shap_values = explainer.shap_values(X_test[:10])

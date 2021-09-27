@@ -1,20 +1,60 @@
 profile:
     # dataset: cnc_toolwear
-    dataset: automotive
+    dataset:
+    - cnc-mill-tool-wear
+    - cnc-meta
 
 clean:
     # target: X1_ActualPosition
-    target: Axis_X_Real_Position
-    classification: False
+    target: tool_condition
+    classification: True
     onehot_encode_target: False
     combine_files: True
     percentage_zeros_threshold: 1.0
     input_max_correlation_threshold: 1.0
+    correlation_metric: pearson
 
 featurize:
     features:
-        # - feature1
-        # - feature2
+        - X1_ActualPosition
+        - X1_ActualVelocity
+        - X1_ActualAcceleration
+        - X1_CommandPosition
+        - X1_CommandVelocity
+        - X1_CommandAcceleration
+        - X1_CurrentFeedback
+        - X1_DCBusVoltage
+        - X1_OutputCurrent
+        - X1_OutputVoltage
+        - X1_OutputPower
+        - Y1_ActualPosition
+        - Y1_ActualVelocity
+        - Y1_ActualAcceleration
+        - Y1_CommandPosition
+        - Y1_CommandVelocity
+        - Y1_CommandAcceleration
+        - Y1_CurrentFeedback
+        - Y1_DCBusVoltage
+        - Y1_OutputCurrent
+        - Y1_OutputVoltage
+        - Y1_OutputPower
+        - Z1_ActualPosition
+        - Z1_ActualVelocity
+        - Z1_ActualAcceleration
+        - Z1_CommandPosition
+        - Z1_CommandVelocity
+        - Z1_CommandAcceleration
+        - S1_ActualPosition
+        - S1_ActualVelocity
+        - S1_ActualAcceleration
+        - S1_CommandPosition
+        - S1_CommandVelocity
+        - S1_CommandAcceleration
+        - S1_CurrentFeedback
+        - S1_DCBusVoltage
+        - S1_OutputCurrent
+        - S1_OutputVoltage
+        - S1_OutputPower
     add_rolling_features: False
     rolling_window_size: 100
     remove_features:
@@ -37,14 +77,14 @@ scale:
     output: minmax
 
 sequentialize:
-    window_size: 40
+    window_size: 1
     overlap: 0
     target_size: 10
     shuffle_samples: False
     future_predict: False
 
 train:
-    learning_method: cnn
+    learning_method: dt
     n_epochs: 50
     batch_size: 256
     kernel_size: 5
@@ -52,3 +92,4 @@ train:
     patience: 40
 
 evaluate:
+    explainable_data_point: 1
